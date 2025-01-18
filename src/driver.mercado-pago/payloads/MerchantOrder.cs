@@ -12,9 +12,9 @@ namespace driver.mercado_pago.payloads
         public long Id {get ;set;}
 
         [JsonProperty(PropertyName = "status")]
-        public string Status {get; set;}
+        public required string Status {get; set;}
 
         [JsonProperty(PropertyName = "external_reference")]
-        public string ExternalReference {get; set;}
+        public required string ExternalReference {get; set;}
     }
 }

@@ -1,3 +1,4 @@
+using common.DataSource;
 using Newtonsoft.Json;
 
 namespace driver.mercado_pago.payloads
@@ -18,6 +19,15 @@ namespace driver.mercado_pago.payloads
 
         [JsonProperty(PropertyName = "items")]
         public IEnumerable<PedidoItem> Items {get; set;}
+
+        public Pedido(PedidoDto pedidoDto){
+            var listaItens = new PedidoItem[]{new(pedidoDto.Itens)};
+            Items = listaItens;
+            TotalAmount = listaItens.Sum(l => l.TotalAmount);
+            ExternalReference = pedidoDto.Id.ToString();
+            Title = $"Pedido-{pedidoDto.Id}";
+            Description = $"SnackTech-Pedido-{pedidoDto.Id}";
+        }
     }
 
     public class PedidoItem{
@@ -44,5 +54,17 @@ namespace driver.mercado_pago.payloads
 
         [JsonProperty(PropertyName = "total_amount")]
         public decimal TotalAmount {get; set;}
+
+        public PedidoItem(IEnumerable<PedidoItemDto> itensDoPedido){
+            var valor = itensDoPedido.Sum(i => i.Produto.Valor * i.Quantidade);
+            SkuNumber = "produto-001";
+            Category = "Combo";
+            Title = "Combo SnackTech";
+            Description = "Conjunto de produtos da lanchonete SnackTeck";
+            UnitPrice = valor;
+            Quantity = 1;
+            UnitMeasure = "unit";
+            TotalAmount = valor;
+        }
     }
 }

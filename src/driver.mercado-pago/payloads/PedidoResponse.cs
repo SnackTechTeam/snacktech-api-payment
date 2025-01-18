@@ -1,3 +1,4 @@
+using common.ApiSource.MercadoPago;
 using Newtonsoft.Json;
 
 namespace driver.mercado_pago.payloads
@@ -10,5 +11,10 @@ namespace driver.mercado_pago.payloads
         [JsonProperty(PropertyName = "qr_data")]
         public string QrData {get; set;} = default!;
 
+        public static implicit operator MercadoPagoQrCodeDto(PedidoResponse pedidoResponse){
+            return new MercadoPagoQrCodeDto{
+                DadoDoCodigo = pedidoResponse.QrData
+            };
+        }
     }
 }

@@ -1,3 +1,4 @@
+using common.ApiSource.MercadoPago;
 using Newtonsoft.Json;
 
 namespace driver.mercado_pago.payloads
@@ -21,5 +22,13 @@ namespace driver.mercado_pago.payloads
 
         [JsonProperty(PropertyName = "live_mode")]
         public bool LiveMode {get; set;} = default!;
+
+        public static implicit operator AutenticacaoMercadoPagoDto(AutenticacaoResponse mercadoPagoAutenticacao){
+            return new AutenticacaoMercadoPagoDto{
+                IdUsuario = mercadoPagoAutenticacao.UserId.ToString(),
+                TempoExpiracao = mercadoPagoAutenticacao.ExpiresIn,
+                TokenDeAcesso = mercadoPagoAutenticacao.AccessToken
+            };
+        }
     }
 }
