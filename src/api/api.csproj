@@ -4,10 +4,28 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <PropertyGroup>
+	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+	  <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="9.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.2.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="7.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\core\core.csproj" />
+    <ProjectReference Include="..\common\common.csproj" />
+    <ProjectReference Include="..\driver.mercado-pago\driver.mercado-pago.csproj" />
   </ItemGroup>
 
 </Project>

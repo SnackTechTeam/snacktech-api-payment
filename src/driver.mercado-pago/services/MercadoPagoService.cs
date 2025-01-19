@@ -42,11 +42,12 @@ namespace driver.mercado_pago.services
             var content = GerarConteudoParaRequisicao(pedidoMercadoPago);
 
             var httpClient = CriarHttpClientBase(serviceUrl);
+            httpClient.DefaultRequestHeaders.Add("Authorization",$"Bearer {accessToken}");
 
             var resposta = await httpClient.PutAsync(rota, content);
             var conteudoResposta = await RetornarConteudo<PedidoResponse>(resposta);
 
-            MercadoPagoQrCodeDto retorno = conteudoResposta;
+            MercadoPagoQrCodeDto retorno = PedidoResponse.ConverterParaMercadoPagoQrCodeDto(conteudoResposta,pedidoMercadoPago.TotalAmount);
 
             return retorno;
         }

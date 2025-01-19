@@ -16,5 +16,11 @@ namespace driver.mercado_pago.payloads
                 DadoDoCodigo = pedidoResponse.QrData
             };
         }
+
+        public static MercadoPagoQrCodeDto ConverterParaMercadoPagoQrCodeDto(PedidoResponse pedidoResponse, decimal valorTotal)
+            => new MercadoPagoQrCodeDto{
+                DadoDoCodigo = pedidoResponse.QrData,
+                ValorPagamento = valorTotal
+            };
     }
 }
