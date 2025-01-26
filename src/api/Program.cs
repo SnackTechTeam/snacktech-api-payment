@@ -10,8 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 //TODO: Recuperar valores de configuração por variável de ambiente ao invés do appsettings
 builder.Services.Configure<MercadoPagoOptions>(builder.Configuration.GetSection("MercadoPagoOptions"));
 builder.Services.Configure<MongoDbOptions>(builder.Configuration.GetSection("MongoDbOptions"));
+builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMqOptions"));
+builder.Services.Configure<RabbitMqPublishValues>(builder.Configuration.GetSection("RabbitMqPublishValues"));
 
 // Add services to the container.
+builder.Services.AddRabbitMQ();
 builder.Services.AddMongoDB();
 builder.Services.AddHttpClient();
 builder.Services.AddMercadoPagoService();

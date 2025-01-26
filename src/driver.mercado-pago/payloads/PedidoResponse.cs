@@ -13,12 +13,14 @@ namespace driver.mercado_pago.payloads
 
         public static implicit operator MercadoPagoQrCodeDto(PedidoResponse pedidoResponse){
             return new MercadoPagoQrCodeDto{
+                LojaPedidoId = pedidoResponse.InStoreOrderId,
                 DadoDoCodigo = pedidoResponse.QrData
             };
         }
 
         public static MercadoPagoQrCodeDto ConverterParaMercadoPagoQrCodeDto(PedidoResponse pedidoResponse, decimal valorTotal)
             => new MercadoPagoQrCodeDto{
+                LojaPedidoId = pedidoResponse.InStoreOrderId,
                 DadoDoCodigo = pedidoResponse.QrData,
                 ValorPagamento = valorTotal
             };

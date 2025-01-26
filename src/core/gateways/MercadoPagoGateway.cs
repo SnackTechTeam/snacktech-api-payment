@@ -5,7 +5,7 @@ using common.Options;
 
 namespace core.gateways
 {
-    public class MercadoPagoGateway(IMercadoPagoIntegration apiMercadoPago, MercadoPagoOptions mercadoPagoOptions)
+    internal class MercadoPagoGateway(IMercadoPagoIntegration apiMercadoPago, MercadoPagoOptions mercadoPagoOptions)
     {
         internal async Task<MercadoPagoQrCodeDto> IntegrarPedido(PedidoDto pedidoDto){
             var autenticacao = await apiMercadoPago.Autenticar(mercadoPagoOptions);

@@ -1,6 +1,9 @@
 
 using common.Api;
 using common.DataSource;
+using common.Enums;
+using common.ExternalSource.MongoDb;
+using core.domain;
 using core.domain.types;
 using core.gateways;
 using core.presenters;
@@ -9,10 +12,14 @@ namespace core.usecases
 {
     internal static class PagamentosUseCase
     {
-        internal static async Task<ResultadoOperacao<PagamentoDto>> GerarPagamentoAtravesDePedido(PedidoDto pedido, MercadoPagoGateway mercadoPagoGateway){
+        internal static async Task<ResultadoOperacao<PagamentoDto>> GerarPagamentoAtravesDePedido(MercadoPagoGateway mercadoPagoGateway, MongoDbGateway mongoDbGateway,PedidoDto pedido){
             try{
                 var dadoPagamento = await mercadoPagoGateway.IntegrarPedido(pedido);
-                //TODO: Gravar pedido + dado pagamento no Mongo Db
+                var entidadePagamento = new PagamentoEntityDto{
+                    pedidoDto = pedido,
+                    pagamentoDto = dadoPagamento
+                };
+                await mongoDbGateway.GravarPagamento(entidadePagamento);
                 return PagamentoPresenter.ApresentarResultadoPagamento(pedido,dadoPagamento);
             }
             catch(Exception ex){
@@ -20,7 +27,7 @@ namespace core.usecases
             }
         }
 
-        internal static async Task<ResultadoOperacao> ProcessarPagamentoRealizado(MercadoPagoGateway mercadoPagoGateway, PagamentoProcessadoDto pagamento){
+        internal static async Task<ResultadoOperacao> ProcessarPagamentoRealizado(MercadoPagoGateway mercadoPagoGateway, MongoDbGateway mongoDbGateway, RabbitMqGateway rabbitMqGateway, PagamentoProcessadoDto pagamento){
             try{
                 ActionPagamentoValido acao = pagamento.Action;
 
@@ -35,16 +42,24 @@ namespace core.usecases
 
                 var referencia = await mercadoPagoGateway.BuscarPedidoViaOrder(pagamento.Id);
 
-                //TODO: Processo que acionaria o microsserviço de pedido para atualizar status
-                var statusProcessoAtualizacaoPedido = true;
+                var pagamentoGravado = await mongoDbGateway.BuscarPagamentoPorPedidoId(referencia);
 
-                //TODO: Gravar que o pagamento foi recebido e que o pedido foi atualizado no MongoDB
+                if(pagamentoGravado is null)
+                    return GeralPresenter.ApresentarResultadoErroLogico($"Não foi encontrado pagamento gravado para pedido {referencia}");
 
-                var retorno = statusProcessoAtualizacaoPedido ?
-                                GeralPresenter.ApresentarResultadoPadraoSucesso():
-                                GeralPresenter.ApresentarResultadoErroLogico($"Não foi possível atualizar pedido {referencia} após pagamento");
+                var dataDeAtualizacao = DateTime.Now;
+                
+                var atualizacaoBase = await mongoDbGateway.AtualizarPagamentoPorPedidoId(referencia,StatusPagamento.Concluido,dataDeAtualizacao);
 
-                return retorno;
+                if(!atualizacaoBase)
+                    return GeralPresenter.ApresentarResultadoErroLogico($"Não foi possível atualizar pagamento do pedido {referencia} na base.");
+
+                var pagamentoId = Guid.Parse(pagamentoGravado.PagamentoId);
+                var pagamentoPedido = new PagamentoPedido(referencia,pagamentoId,dataDeAtualizacao,"MercadoPago");
+
+                await rabbitMqGateway.PublicarMensagemPagamentoRealizado(pagamentoPedido);
+
+                return GeralPresenter.ApresentarResultadoPadraoSucesso();
             }
             catch(ArgumentException ex){
                 return GeralPresenter.ApresentarResultadoErroLogico(ex.Message);
@@ -54,17 +69,26 @@ namespace core.usecases
             }
         }
 
-        internal static async Task<ResultadoOperacao> ProcessarPagamentoViaMock(Guid identificacaoPedido){
+        internal static async Task<ResultadoOperacao> ProcessarPagamentoViaMock(MongoDbGateway mongoDbGateway, RabbitMqGateway rabbitMqGateway,Guid identificacaoPedido){
             try{
-                //TODO: Processo que acionaria o microsserviço de pedido para atualizar status
-                await Task.FromResult(0);
-                var statusProcessoAtualizacaoPedido = true;
+               var pagamentoGravado = await mongoDbGateway.BuscarPagamentoPorPedidoId(identificacaoPedido);
 
-                var retorno = statusProcessoAtualizacaoPedido?
-                                GeralPresenter.ApresentarResultadoPadraoSucesso():
-                                GeralPresenter.ApresentarResultadoErroLogico($"Não foi possível atualizar pedido {identificacaoPedido} após pagamento");
+                if(pagamentoGravado is null)
+                    return GeralPresenter.ApresentarResultadoErroLogico($"Não foi encontrado pagamento gravado para pedido {identificacaoPedido}");
 
-                return retorno;
+                var dataDeAtualizacao = DateTime.Now;
+                
+                var atualizacaoBase = await mongoDbGateway.AtualizarPagamentoPorPedidoId(identificacaoPedido,StatusPagamento.Concluido,dataDeAtualizacao);
+
+                if(!atualizacaoBase)
+                    return GeralPresenter.ApresentarResultadoErroLogico($"Não foi possível atualizar pagamento do pedido {identificacaoPedido} na base.");
+
+                var pagamentoId = Guid.Parse(pagamentoGravado.PagamentoId);
+                var pagamentoPedido = new PagamentoPedido(identificacaoPedido,pagamentoId,dataDeAtualizacao,"MercadoPago");
+
+                await rabbitMqGateway.PublicarMensagemPagamentoRealizado(pagamentoPedido);
+
+                return GeralPresenter.ApresentarResultadoPadraoSucesso();
             }
             catch(ArgumentException ex){
                 return GeralPresenter.ApresentarResultadoErroLogico(ex.Message);

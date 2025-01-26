@@ -1,10 +1,13 @@
 
+using common.Enums;
+using common.ExternalSource.MongoDb;
+using common.Interfaces;
 using driver.database.mongo.Entities;
 using MongoDB.Driver;
 
 namespace driver.database.mongo.Repositories
 {
-    public class PagamentoRepository
+    public class PagamentoRepository : IMongoDbIntegration
     {
         private readonly IMongoCollection<Pagamento> collection;
 
@@ -28,17 +31,29 @@ namespace driver.database.mongo.Repositories
             collection.Indexes.CreateMany(new[] {indexModelId,indexModelPedidoId,indexModelClienteId,indexModelStatusData});
         }
 
-        public async Task CriarPagamento(Pagamento pagamento){
+        public async Task<BuscaPagamentoDto?> BuscarPagamentoPorPedidoId(string pedidoId){
+            return await collection.Find(c => c.PedidoId == pedidoId).FirstOrDefaultAsync();
+        }
+
+        public async Task CriarPagamento(PagamentoEntityDto pagamentoDto){
+            Pagamento pagamento = Pagamento.ConverterParaPagamento(pagamentoDto,StatusPagamento.Pendente);
             await collection.InsertOneAsync(pagamento);
         }
 
-        public async Task<bool> AtualizarStatusPagamento(string pagamentoId, string novoStatus){
-            var filtro = Builders<Pagamento>.Filter.Eq(p => p.Id, pagamentoId);
-            var atualizacao = Builders<Pagamento>.Update.Set(p => p.Status, novoStatus);
+        public async Task<bool> AtualizarStatusPagamentoPorPedidoId(string pedidoId, StatusPagamento novoStatus, DateTime dataAtualizacao){
+
+            var filtro = Builders<Pagamento>.Filter.Eq(p => p.PedidoId, pedidoId);
+            
+            var atualizacao = Builders<Pagamento>.Update
+                                .Set(p => p.Status, nameof(novoStatus))
+                                .Set(p => p.DataUltimaAtualizacao, dataAtualizacao);
+
 
             var resultado = await collection.UpdateOneAsync(filtro,atualizacao);
 
             return resultado.ModifiedCount > 0;
         }
+
+
     }
 }

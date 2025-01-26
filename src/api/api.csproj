@@ -18,6 +18,7 @@
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="9.0.1" />
     <PackageReference Include="MongoDB.Driver" Version="3.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="RabbitMQ.Client" Version="7.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="7.2.0" />
@@ -27,6 +28,7 @@
     <ProjectReference Include="..\core\core.csproj" />
     <ProjectReference Include="..\common\common.csproj" />
     <ProjectReference Include="..\driver.mercado-pago\driver.mercado-pago.csproj" />
+    <ProjectReference Include="..\driver.rabbitmq\driver.rabbitmq.csproj" />
   </ItemGroup>
 
 </Project>
