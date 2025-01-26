@@ -7,9 +7,12 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//TODO: Recuperar valores de configuração por variável de ambiente ao invés do appsettings
 builder.Services.Configure<MercadoPagoOptions>(builder.Configuration.GetSection("MercadoPagoOptions"));
+builder.Services.Configure<MongoDbOptions>(builder.Configuration.GetSection("MongoDbOptions"));
 
 // Add services to the container.
+builder.Services.AddMongoDB();
 builder.Services.AddHttpClient();
 builder.Services.AddMercadoPagoService();
 builder.Services.AddDomainControllers();

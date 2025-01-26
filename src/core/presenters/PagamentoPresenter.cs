@@ -4,11 +4,11 @@ using common.DataSource;
 
 namespace core.presenters
 {
-    internal class PagamentoPresenter
+    internal static class PagamentoPresenter
     {
         internal static ResultadoOperacao<PagamentoDto> ApresentarResultadoPagamento(PedidoDto pedido,MercadoPagoQrCodeDto dadoPagamento){
             var pagamentoDto = new PagamentoDto{
-                Id = pedido.Id,
+                Id = pedido.PedidoId,
                 QrCode = dadoPagamento.DadoDoCodigo,
                 ValorTotal = dadoPagamento.ValorPagamento
             };

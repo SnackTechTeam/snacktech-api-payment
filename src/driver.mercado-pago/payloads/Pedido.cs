@@ -24,9 +24,9 @@ namespace driver.mercado_pago.payloads
             var listaItens = new PedidoItem[]{new(pedidoDto.Itens)};
             Items = listaItens;
             TotalAmount = listaItens.Sum(l => l.TotalAmount);
-            ExternalReference = pedidoDto.Id.ToString();
-            Title = $"Pedido-{pedidoDto.Id}";
-            Description = $"SnackTech-Pedido-{pedidoDto.Id}";
+            ExternalReference = pedidoDto.PedidoId.ToString();
+            Title = $"Pedido-{pedidoDto.PedidoId}";
+            Description = $"SnackTech-Pedido-{pedidoDto.PedidoId}";
         }
     }
 
@@ -56,7 +56,7 @@ namespace driver.mercado_pago.payloads
         public decimal TotalAmount {get; set;}
 
         public PedidoItem(IEnumerable<PedidoItemDto> itensDoPedido){
-            var valor = itensDoPedido.Sum(i => i.Produto.Valor * i.Quantidade);
+            var valor = itensDoPedido.Sum(i => i.Valor);
             SkuNumber = "produto-001";
             Category = "Combo";
             Title = "Combo SnackTech";

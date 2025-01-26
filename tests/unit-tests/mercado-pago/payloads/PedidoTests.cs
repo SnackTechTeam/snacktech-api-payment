@@ -9,11 +9,9 @@ namespace unit_tests.mercadopago.payloads
         [Fact]
         public void CriarPedidoItemCorretamente()
         {
-            var produto1 = ObjectsBuilder.BuildProdutoDto(1,"produto","descricao",10.0M);
-            var produto2 = ObjectsBuilder.BuildProdutoDto(3,"produto2","descricao",30.0M);
             var pedidoItensDto = new List<PedidoItemDto>(){
-                ObjectsBuilder.BuildPedidoItemDto(produto1,2),
-                ObjectsBuilder.BuildPedidoItemDto(produto2,1)
+                ObjectsBuilder.BuildPedidoItemDto(10.0M,2),
+                ObjectsBuilder.BuildPedidoItemDto(30.0M,1)
             };
             var valorEsperadoProduto1 = 2 * 10;
             var valorEsperadoProduto2 = 1 * 30;
@@ -32,26 +30,21 @@ namespace unit_tests.mercadopago.payloads
 
         [Fact]
         public void CriarPedidoCorretamente(){
-            var produto1 = ObjectsBuilder.BuildProdutoDto(1,"produto","descricao",10.0M);
-            var produto2 = ObjectsBuilder.BuildProdutoDto(3,"produto2","descricao",30.0M);
             var pedidoItensDto = new List<PedidoItemDto>(){
-                ObjectsBuilder.BuildPedidoItemDto(produto1,2),
-                ObjectsBuilder.BuildPedidoItemDto(produto2,1)
+                 ObjectsBuilder.BuildPedidoItemDto(10.0M,2),
+                ObjectsBuilder.BuildPedidoItemDto(30.0M,1)
             };
             var pedidoDto = new PedidoDto{
-                Id = Guid.NewGuid(),
-                DataCriacao = DateTime.Now,
-                Status = 1,
                 Cliente = ObjectsBuilder.BuildClienteDto(),
                 Itens = pedidoItensDto
             };
 
-            var valorTotalEsperado = pedidoItensDto.Sum(p => p.Produto.Valor * p.Quantidade);
+            var valorTotalEsperado = pedidoItensDto.Sum(p => p.Valor);
             var pedido = new Pedido(pedidoDto);
 
             Assert.Contains("Pedido",pedido.Title);
             Assert.Contains("SnackTech-Pedido-",pedido.Description);
-            Assert.True(pedido.ExternalReference == pedidoDto.Id.ToString());
+            Assert.True(pedido.ExternalReference == pedidoDto.PedidoId.ToString());
             Assert.Equal(pedido.TotalAmount, valorTotalEsperado);
         }
     }

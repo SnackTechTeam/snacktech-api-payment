@@ -35,7 +35,7 @@ namespace core.usecases
 
                 var referencia = await mercadoPagoGateway.BuscarPedidoViaOrder(pagamento.Id);
 
-                //TODO: Processo que acionaria o misserviço de pedido para atualizar status
+                //TODO: Processo que acionaria o microsserviço de pedido para atualizar status
                 var statusProcessoAtualizacaoPedido = true;
 
                 //TODO: Gravar que o pagamento foi recebido e que o pedido foi atualizado no MongoDB
@@ -56,7 +56,7 @@ namespace core.usecases
 
         internal static async Task<ResultadoOperacao> ProcessarPagamentoViaMock(Guid identificacaoPedido){
             try{
-                //TODO: Processo que acionaria o misserviço de pedido para atualizar status
+                //TODO: Processo que acionaria o microsserviço de pedido para atualizar status
                 await Task.FromResult(0);
                 var statusProcessoAtualizacaoPedido = true;
 
