@@ -35,6 +35,7 @@ namespace unit_tests.mercadopago.payloads
                 ObjectsBuilder.BuildPedidoItemDto(30.0M,1)
             };
             var pedidoDto = new PedidoDto{
+                PedidoId = Guid.NewGuid(),
                 Cliente = ObjectsBuilder.BuildClienteDto(),
                 Itens = pedidoItensDto
             };

@@ -3,6 +3,7 @@ using common.Api;
 using common.DataSource;
 using common.Enums;
 using common.ExternalSource.MongoDb;
+using common.Interfaces;
 using core.domain;
 using core.domain.types;
 using core.gateways;
@@ -27,7 +28,7 @@ namespace core.usecases
             }
         }
 
-        internal static async Task<ResultadoOperacao> ProcessarPagamentoRealizado(MercadoPagoGateway mercadoPagoGateway, MongoDbGateway mongoDbGateway, RabbitMqGateway rabbitMqGateway, PagamentoProcessadoDto pagamento){
+        internal static async Task<ResultadoOperacao> ProcessarPagamentoRealizado(MercadoPagoGateway mercadoPagoGateway, MongoDbGateway mongoDbGateway, SqsGateway sqsGateway, PagamentoProcessadoDto pagamento){
             try{
                 ActionPagamentoValido acao = pagamento.Action;
 
@@ -54,10 +55,9 @@ namespace core.usecases
                 if(!atualizacaoBase)
                     return GeralPresenter.ApresentarResultadoErroLogico($"Não foi possível atualizar pagamento do pedido {referencia} na base.");
 
-                var pagamentoId = Guid.Parse(pagamentoGravado.PagamentoId);
-                var pagamentoPedido = new PagamentoPedido(referencia,pagamentoId,dataDeAtualizacao,"MercadoPago");
+                var pagamentoPedido = new PagamentoPedido(referencia,pagamentoGravado.PagamentoId,dataDeAtualizacao,"MercadoPago");
 
-                await rabbitMqGateway.PublicarMensagemPagamentoRealizado(pagamentoPedido);
+                await sqsGateway.PublicarMensagemPagamentoNoSqs(pagamentoPedido);
 
                 return GeralPresenter.ApresentarResultadoPadraoSucesso();
             }
@@ -69,7 +69,7 @@ namespace core.usecases
             }
         }
 
-        internal static async Task<ResultadoOperacao> ProcessarPagamentoViaMock(MongoDbGateway mongoDbGateway, RabbitMqGateway rabbitMqGateway,Guid identificacaoPedido){
+        internal static async Task<ResultadoOperacao> ProcessarPagamentoViaMock(MongoDbGateway mongoDbGateway, SqsGateway sqsGateway,Guid identificacaoPedido){
             try{
                var pagamentoGravado = await mongoDbGateway.BuscarPagamentoPorPedidoId(identificacaoPedido);
 
@@ -83,10 +83,9 @@ namespace core.usecases
                 if(!atualizacaoBase)
                     return GeralPresenter.ApresentarResultadoErroLogico($"Não foi possível atualizar pagamento do pedido {identificacaoPedido} na base.");
 
-                var pagamentoId = Guid.Parse(pagamentoGravado.PagamentoId);
-                var pagamentoPedido = new PagamentoPedido(identificacaoPedido,pagamentoId,dataDeAtualizacao,"MercadoPago");
+                var pagamentoPedido = new PagamentoPedido(identificacaoPedido,pagamentoGravado.PagamentoId,dataDeAtualizacao,"MercadoPago");
 
-                await rabbitMqGateway.PublicarMensagemPagamentoRealizado(pagamentoPedido);
+                await sqsGateway.PublicarMensagemPagamentoNoSqs(pagamentoPedido);
 
                 return GeralPresenter.ApresentarResultadoPadraoSucesso();
             }

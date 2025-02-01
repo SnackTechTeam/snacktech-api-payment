@@ -45,7 +45,7 @@ namespace driver.database.mongo.Repositories
             var filtro = Builders<Pagamento>.Filter.Eq(p => p.PedidoId, pedidoId);
             
             var atualizacao = Builders<Pagamento>.Update
-                                .Set(p => p.Status, nameof(novoStatus))
+                                .Set(p => p.Status, novoStatus.ToString())
                                 .Set(p => p.DataUltimaAtualizacao, dataAtualizacao);
 
 

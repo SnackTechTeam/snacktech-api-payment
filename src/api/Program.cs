@@ -1,7 +1,8 @@
-using System.Reflection;
 using api.Configuration;
 using api.Configuration.HealthChecks;
 using common.Options;
+using driver.amazon.sqs;
+using driver.database.mongo;
 using driver.mercado_pago;
 using Microsoft.OpenApi.Models;
 
@@ -10,12 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 //TODO: Recuperar valores de configuração por variável de ambiente ao invés do appsettings
 builder.Services.Configure<MercadoPagoOptions>(builder.Configuration.GetSection("MercadoPagoOptions"));
 builder.Services.Configure<MongoDbOptions>(builder.Configuration.GetSection("MongoDbOptions"));
-builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMqOptions"));
-builder.Services.Configure<RabbitMqPublishValues>(builder.Configuration.GetSection("RabbitMqPublishValues"));
+builder.Services.Configure<SqsOptions>(builder.Configuration.GetSection("SqsOptions"));
 
 // Add services to the container.
-builder.Services.AddRabbitMQ();
+builder.Services.AddSqsService();
 builder.Services.AddMongoDB();
+builder.Services.AddMongoDbService();
 builder.Services.AddHttpClient();
 builder.Services.AddMercadoPagoService();
 builder.Services.AddDomainControllers();

@@ -28,7 +28,8 @@
     <ProjectReference Include="..\core\core.csproj" />
     <ProjectReference Include="..\common\common.csproj" />
     <ProjectReference Include="..\driver.mercado-pago\driver.mercado-pago.csproj" />
-    <ProjectReference Include="..\driver.rabbitmq\driver.rabbitmq.csproj" />
+    <ProjectReference Include="..\driver.amazon.sqs\driver.amazon.sqs.csproj" />
+    <ProjectReference Include="..\driver.database.mongo\driver.database.mongo.csproj" />
   </ItemGroup>
 
 </Project>

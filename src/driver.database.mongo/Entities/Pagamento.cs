@@ -1,5 +1,3 @@
-using common.ApiSource.MercadoPago;
-using common.DataSource;
 using common.Enums;
 using common.ExternalSource.MongoDb;
 using MongoDB.Bson;
@@ -32,7 +30,7 @@ namespace driver.database.mongo.Entities
                 LojaPedidoId = pagamentoEntityDto.pagamentoDto.LojaPedidoId,
                 QrCodePagamento = pagamentoEntityDto.pagamentoDto.DadoDoCodigo,
                 Valor = pagamentoEntityDto.pagamentoDto.ValorPagamento,
-                Status = nameof(statusPagamento),
+                Status = statusPagamento.ToString(),
                 DataUltimaAtualizacao = null
             };
         }

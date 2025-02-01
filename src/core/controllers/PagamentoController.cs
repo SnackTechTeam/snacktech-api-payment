@@ -11,23 +11,22 @@ namespace core.controllers
 {
     public class PagamentoController(IMercadoPagoIntegration mercadoPagoIntegration, 
                                         IMongoDbIntegration mongoDbIntegration, 
-                                        IRabbitIntegration rabbitIntegration,
-                                        IOptions<MercadoPagoOptions> mercadoPagoOptions,
-                                        IOptions<RabbitMqPublishValues> rabbitPublishValues) : IPagamentoController
+                                        ISqsIntegration sqsIntegration,
+                                        IOptions<MercadoPagoOptions> mercadoPagoOptions) : IPagamentoController
     {
         public async Task<ResultadoOperacao> ProcessarPagamento(PagamentoProcessadoDto pagamento){
             var mercadoPagoGateway = new MercadoPagoGateway(mercadoPagoIntegration,mercadoPagoOptions.Value);
             var mongoDbGateway = new MongoDbGateway(mongoDbIntegration);
-            var rabbitMqGateway = new RabbitMqGateway(rabbitIntegration,rabbitPublishValues.Value);
-            var resultado = await PagamentosUseCase.ProcessarPagamentoRealizado(mercadoPagoGateway,mongoDbGateway,rabbitMqGateway,pagamento);
+            var sqsGateway = new SqsGateway(sqsIntegration);
+            var resultado = await PagamentosUseCase.ProcessarPagamentoRealizado(mercadoPagoGateway,mongoDbGateway,sqsGateway,pagamento);
 
             return resultado;
         }
 
         public async Task<ResultadoOperacao> ProcessarPagamentoMock(Guid identificacaoPedido){
             var mongoDbGateway = new MongoDbGateway(mongoDbIntegration);
-            var rabbitMqGateway = new RabbitMqGateway(rabbitIntegration,rabbitPublishValues.Value);
-            var resultado = await PagamentosUseCase.ProcessarPagamentoViaMock(mongoDbGateway,rabbitMqGateway,identificacaoPedido);
+            var sqsGateway = new SqsGateway(sqsIntegration);
+            var resultado = await PagamentosUseCase.ProcessarPagamentoViaMock(mongoDbGateway,sqsGateway,identificacaoPedido);
             return resultado;
         }
 

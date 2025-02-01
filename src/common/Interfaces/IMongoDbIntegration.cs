@@ -8,6 +8,6 @@ namespace common.Interfaces
     {
         Task CriarPagamento(PagamentoEntityDto pagamentoDto);
         Task<bool> AtualizarStatusPagamentoPorPedidoId(string pedidoId, StatusPagamento novoStatus, DateTime dataAtualizacao);
-       Task<BuscaPagamentoDto?> BuscarPagamentoPorPedidoId(string pedidoId);
+        Task<BuscaPagamentoDto?> BuscarPagamentoPorPedidoId(string pedidoId);
     }
 }
