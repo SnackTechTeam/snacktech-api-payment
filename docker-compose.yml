@@ -1,0 +1,78 @@
+name: snack-tech-payment
+
+services:
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017" # Porta padrão do MongoDB
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin # Usuário root
+      MONGO_INITDB_ROOT_PASSWORD: admin123 # Senha do usuário root
+    networks:
+      - snacktech-payment-network
+    volumes:
+      - mongodb_data:/data/db # Persistência de dados
+      - mongodb_config:/data/configdb # Persistência de configuração
+
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack
+    ports:
+      - "4566:4566"  # Porta principal do LocalStack
+    environment:
+      - SERVICES=sqs
+      - DEBUG=1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_REGION=us-east-1  # Região padrão para a AWS
+    networks:
+      - snacktech-payment-network
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  payment-api:
+    container_name: snacktech-payment-api
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: snacktech-payment-api:alpha
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - MercadoPagoOptions__UrlBase=https://api.mercadopago.com/
+      - MercadoPagoOptions__ClientSecret=nmJHGJOkUiMa67wyVunFasbjuRbBxasA
+      - MercadoPagoOptions__ClientId=7910800073137785
+      - MercadoPagoOptions__UserId=2012037660
+      - MercadoPagoOptions__PosId=STBF001STBFPOS001
+      - MongoDbOptions__Endpoint=mongodb
+      - MongoDbOptions__Port=27017
+      - MongoDbOptions__UserName=admin
+      - MongoDbOptions__Password=admin123
+      - MongoDbOptions__SSL=false
+      - MongoDbOptions__SslCertificatePath=
+      - MongoDbOptions__DatabaseName=snacktech-api-payment
+      - SqsOptions__ServiceUrl=http://localstack:4566
+      - SqsOptions__QueueUrl=http://localstack:4566/000000000000/snacktech-processed-payments
+      - SqsOptions__AwsAccessKeyId=test
+      - SqsOptions__AwsSecretAccessKey=test
+    ports:
+      - 8080:8080
+      - 8081:8081
+    restart: on-failure
+    networks:
+      - snacktech-payment-network
+    depends_on:
+      - mongodb
+      - localstack
+
+networks:
+  snacktech-payment-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+  mongodb_config:
