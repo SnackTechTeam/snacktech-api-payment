@@ -32,7 +32,13 @@ TODO
 Depois de rodar o comando docker-compose up, necessário executar o comando:
 aws --endpoint-url=http://localhost:4566 sqs create-queue --queue-name snacktech-processed-payments
 
-para criar a fila SQS dentro do LocalStack
+para criar a fila SQS dentro do LocalStack.
+
+Pode ser usado o comando:
+
+ aws --endpoint-url=http://localhost:4566 sqs receive-message     --queue-url http://localhost:4566/000000000000/snacktech-processed-payments
+
+ para ver a mensagem dentro da fila, porem o comando só retorna a primeira mensagem.
 
 ### Uso
 
