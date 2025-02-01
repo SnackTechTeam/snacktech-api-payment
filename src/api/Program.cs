@@ -8,7 +8,11 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//TODO: Recuperar valores de configuração por variável de ambiente ao invés do appsettings
+builder.Configuration
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+        .AddEnvironmentVariables();
+
 builder.Services.Configure<MercadoPagoOptions>(builder.Configuration.GetSection("MercadoPagoOptions"));
 builder.Services.Configure<MongoDbOptions>(builder.Configuration.GetSection("MongoDbOptions"));
 builder.Services.Configure<SqsOptions>(builder.Configuration.GetSection("SqsOptions"));
@@ -33,7 +37,7 @@ builder.Services.AddSwaggerGen(c =>{
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "SnackTech Payment API", Version = "v1" });
 });
 
-builder.Services.AddHealthChecks();
+builder.Services.AddCustomHealthChecks();
 
 var app = builder.Build();
 

@@ -1,18 +1,44 @@
+using System.Net;
 using System.Net.Mime;
 using System.Text.Json;
+using common.Options;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 
 namespace api.Configuration.HealthChecks
 {
     public static class HealthChecksExtensions
     {
-        //TODO: Adicionar HealthCheck para MP e MongoDB
+        public static  IServiceCollection AddCustomHealthChecks(this IServiceCollection services){
+            var sp = services.BuildServiceProvider();
+            //MP
+            var mpData = sp.GetRequiredService<IOptions<MercadoPagoOptions>>().Value;
+            AddMercadoPagoHc(services,mpData);
+                    
+            //MongoDB
+            services.AddHealthChecks()
+                .AddMongoDb((sp) => sp.GetRequiredService<IMongoDatabase>(),"Mongo DB",HealthStatus.Unhealthy);
+                
+            //SQS
 
+            return services;
+        }
 
-         public static void UseCustomHealthChecks(this WebApplication app){
-            app.MapHealthChecks("api/health/ready", new HealthCheckOptions
+        private static void AddMercadoPagoHc(IServiceCollection services, MercadoPagoOptions mercadoPagoOptions){
+            services.AddHealthChecks().AddAsyncCheck("Mercado Pago API", async () => {
+                var httpClient = new HttpClient();
+                var response = await httpClient.GetAsync($"{mercadoPagoOptions.UrlBase}users/me");
+                return response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.Forbidden
+                    ? HealthCheckResult.Healthy("Mercado Pago API está funcionando")
+                    : HealthCheckResult.Unhealthy("Erro ao acessar a API do Mercado Pago");
+            }, tags: new[] { "external", "mercadopago" });
+        }
+
+        public static void UseCustomHealthChecks(this WebApplication app){
+            app.MapHealthChecks("api/health", new HealthCheckOptions
             {
-                Predicate = (check) => check.Name == "API",
                 ResponseWriter = async (context, report) =>
                 {
                     var result = JsonSerializer.Serialize(
