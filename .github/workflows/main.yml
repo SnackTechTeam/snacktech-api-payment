@@ -24,7 +24,7 @@ jobs:
       id: set_solution_path
       run: |
         # Informar aqui o caminho para o arquivo da solution
-        SOLUTION_PATH="./snacktech-api-payment.sln"
+        SOLUTION_PATH="./snacktech.api.payment.sln"
         echo "SOLUTION_PATH=$SOLUTION_PATH" >> $GITHUB_ENV
 
     - name: Restore dependencies
