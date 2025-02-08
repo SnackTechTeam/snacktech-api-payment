@@ -1,19 +1,17 @@
-
 using common.Api;
 using common.DataSource;
 using common.Enums;
 using common.ExternalSource.MongoDb;
-using common.Interfaces;
 using core.domain;
 using core.domain.types;
-using core.gateways;
+using core.interfaces.gateways;
 using core.presenters;
 
 namespace core.usecases
 {
     internal static class PagamentosUseCase
     {
-        internal static async Task<ResultadoOperacao<PagamentoDto>> GerarPagamentoAtravesDePedido(MercadoPagoGateway mercadoPagoGateway, MongoDbGateway mongoDbGateway,PedidoDto pedido){
+        internal static async Task<ResultadoOperacao<PagamentoDto>> GerarPagamentoAtravesDePedido(IMercadoPagoGateway mercadoPagoGateway, IMongoDbGateway mongoDbGateway,PedidoDto pedido){
             try{
                 var dadoPagamento = await mercadoPagoGateway.IntegrarPedido(pedido);
                 var entidadePagamento = new PagamentoEntityDto{
@@ -28,7 +26,7 @@ namespace core.usecases
             }
         }
 
-        internal static async Task<ResultadoOperacao> ProcessarPagamentoRealizado(MercadoPagoGateway mercadoPagoGateway, MongoDbGateway mongoDbGateway, SqsGateway sqsGateway, PagamentoProcessadoDto pagamento){
+        internal static async Task<ResultadoOperacao> ProcessarPagamentoRealizado(IMercadoPagoGateway mercadoPagoGateway, IMongoDbGateway mongoDbGateway, ISqsGateway sqsGateway, PagamentoProcessadoDto pagamento){
             try{
                 ActionPagamentoValido acao = pagamento.Action;
 
@@ -69,7 +67,7 @@ namespace core.usecases
             }
         }
 
-        internal static async Task<ResultadoOperacao> ProcessarPagamentoViaMock(MongoDbGateway mongoDbGateway, SqsGateway sqsGateway,Guid identificacaoPedido){
+        internal static async Task<ResultadoOperacao> ProcessarPagamentoViaMock(IMongoDbGateway mongoDbGateway, ISqsGateway sqsGateway,Guid identificacaoPedido){
             try{
                var pagamentoGravado = await mongoDbGateway.BuscarPagamentoPorPedidoId(identificacaoPedido);
 

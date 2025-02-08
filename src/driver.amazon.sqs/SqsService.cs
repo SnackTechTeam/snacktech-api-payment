@@ -1,4 +1,3 @@
-using Amazon;
 using Amazon.SQS;
 using Amazon.SQS.Model;
 using common.Interfaces;
@@ -15,15 +14,11 @@ namespace driver.amazon.sqs
         private readonly IAmazonSQS sqsClient;
         private readonly string queueUrl;
 
-        public SqsService(ILogger<SqsService> logger, IOptions<SqsOptions> sqsOptions){
+        public SqsService(ILogger<SqsService> logger,IAmazonSQS amazonSQS, IOptions<SqsOptions> sqsOptions){
             this.logger = logger;
             
-            var settings = sqsOptions.Value;
-            var config = new AmazonSQSConfig{
-                    ServiceURL = settings.ServiceUrl
-                };
-                
-            this.sqsClient = new AmazonSQSClient(settings.AwsAccessKeyId, settings.AwsSecretAccessKey, config);
+            var settings = sqsOptions.Value;    
+            this.sqsClient = amazonSQS;
             queueUrl = settings.QueueUrl;
         }
 

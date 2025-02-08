@@ -10,11 +10,11 @@ namespace unit_tests.mercadopago.payloads
         public void CriarPedidoItemCorretamente()
         {
             var pedidoItensDto = new List<PedidoItemDto>(){
-                ObjectsBuilder.BuildPedidoItemDto(10.0M,2),
-                ObjectsBuilder.BuildPedidoItemDto(30.0M,1)
+                ObjectsBuilder.BuildPedidoItemDto(10.0M),
+                ObjectsBuilder.BuildPedidoItemDto(30.0M)
             };
-            var valorEsperadoProduto1 = 2 * 10;
-            var valorEsperadoProduto2 = 1 * 30;
+            var valorEsperadoProduto1 = 10;
+            var valorEsperadoProduto2 = 30;
             var valorTotalEsperado = valorEsperadoProduto1 + valorEsperadoProduto2;
             var pedidoItem = new PedidoItem(pedidoItensDto);
 
@@ -31,8 +31,8 @@ namespace unit_tests.mercadopago.payloads
         [Fact]
         public void CriarPedidoCorretamente(){
             var pedidoItensDto = new List<PedidoItemDto>(){
-                 ObjectsBuilder.BuildPedidoItemDto(10.0M,2),
-                ObjectsBuilder.BuildPedidoItemDto(30.0M,1)
+                 ObjectsBuilder.BuildPedidoItemDto(10.0M),
+                ObjectsBuilder.BuildPedidoItemDto(30.0M)
             };
             var pedidoDto = new PedidoDto{
                 PedidoId = Guid.NewGuid(),

@@ -35,8 +35,8 @@ namespace driver.database.mongo.Entities
             };
         }
 
-        public static implicit operator BuscaPagamentoDto(Pagamento pagamento){
-            return new BuscaPagamentoDto{
+        public static implicit operator BuscaPagamentoDto?(Pagamento? pagamento){
+            return pagamento == null? default : new BuscaPagamentoDto{
                 ClienteId = pagamento.Cliente.ClienteId,
                 DataCriacao = pagamento.DataCriacao,
                 DataUltimaAtualizacao = pagamento.DataUltimaAtualizacao,

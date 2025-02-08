@@ -39,12 +39,7 @@ namespace core.domain.types
     {
         if (value < DATA_MINIMA)
         {
-            throw new ArgumentException("Não é permitido criar pedidos com data anterior a 01/01/2024.");
-        }
-
-        if (value > DateTime.Now)
-        {
-            throw new ArgumentException("Não é permitido criar pedidos com data/horário futuro.");
+            throw new ArgumentException("Não é permitido trabalhar com datas anteriores a 01/01/2024.");
         }
     }
 

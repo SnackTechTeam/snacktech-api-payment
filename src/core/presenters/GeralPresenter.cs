@@ -2,7 +2,7 @@ using common.Api;
 
 namespace core.presenters
 {
-    internal class GeralPresenter
+    internal static class GeralPresenter
     {
         internal static ResultadoOperacao<T> ApresentarResultadoErroLogico<T>(string mensagem){
             return new ResultadoOperacao<T>(mensagem, true);
