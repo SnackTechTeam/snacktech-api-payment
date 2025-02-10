@@ -15,13 +15,5 @@ namespace driver.database.mongo.Entities
                 Nome = clienteDto.Nome
             };
         }
-
-        public static implicit operator ClienteDto(Cliente cliente){
-            return new ClienteDto{
-                Id = Guid.Parse(cliente.ClienteId),
-                Email = cliente.Email,
-                Nome = cliente.Nome
-            };
-        }
     }
 }

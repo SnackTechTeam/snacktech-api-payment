@@ -18,6 +18,7 @@ builder.Services.Configure<MongoDbOptions>(builder.Configuration.GetSection("Mon
 builder.Services.Configure<SqsOptions>(builder.Configuration.GetSection("SqsOptions"));
 
 // Add services to the container.
+builder.Services.AddAmazonSqs();
 builder.Services.AddSqsService();
 builder.Services.AddMongoDB();
 builder.Services.AddMongoDbService();
@@ -29,7 +30,8 @@ builder.Services.AddControllers()
     {
         options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
     });
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGenNewtonsoftSupport();
 builder.Services.AddSwaggerGen(c =>{
@@ -41,7 +43,6 @@ builder.Services.AddCustomHealthChecks();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();

@@ -32,7 +32,9 @@ namespace driver.database.mongo.Repositories
         }
 
         public async Task<BuscaPagamentoDto?> BuscarPagamentoPorPedidoId(string pedidoId){
-            return await collection.Find(c => c.PedidoId == pedidoId).FirstOrDefaultAsync();
+            var pagamentos = await collection.FindAsync(c => c.PedidoId == pedidoId);
+            var pagamento = await pagamentos.FirstOrDefaultAsync();
+            return pagamento is null?default:pagamento;
         }
 
         public async Task CriarPagamento(PagamentoEntityDto pagamentoDto){
