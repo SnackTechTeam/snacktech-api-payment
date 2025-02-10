@@ -132,12 +132,9 @@ jobs:
           MercadoPagoOptions__ClientId: ${{ vars.MERCADO_PAGO_CLIENT_ID }}
           MercadoPagoOptions__UserId: ${{ vars.MERCADO_PAGO_USER_ID }}
           MercadoPagoOptions__PosId: ${{ vars.MERCADO_PAGO_POS_ID }}
-          MongoDbOptions__Endpoint: ${{ vars.DB_HOST_PAYMENT }}
-          MongoDbOptions__Port: ${{ vars.DB_PORT_PAYMENT }}
+          MongoDbOptions__ConnectionString: ${{ secrets.PAGAMENTO_DB_CONNECTION_STRING }}
           MongoDbOptions__Database: ${{ vars.DB_NAME_PAYMENT }}
-          MongoDbOptions__UserName: ${{ secrets.DB_USER_PAYMENT }}
-          MongoDbOptions__Password: ${{ secrets.DB_PASSWORD_PAYMENT }}
-          SqsOptions__QueueUrl: ${{ vars.SQS_QUEUE_PAYMENT_URL }}
+          SqsOptions__QueueUrl: https://sqs.${{ vars.AWS_REGION }}.amazonaws.com/${{ secrets.AWS_ACCOUNT_ID_VOCLABS }}/${{ vars.SQS_QUEUE_PAYMENT_NAME }} 
           SqsOptions__ServiceUrl: https://sqs.${{ vars.AWS_REGION }}.amazonaws.com
           SqsOptions__AwsAccessKeyId: ${{ secrets.AWS_ACCESS_KEY_ID }}
           SqsOptions__AwsSecretAccessKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -148,10 +145,8 @@ jobs:
             --from-literal=MercadoPagoOptions__ClientId="$MercadoPagoOptions__ClientId" \
             --from-literal=MercadoPagoOptions__UserId="$MercadoPagoOptions__UserId" \
             --from-literal=MercadoPagoOptions__PosId="$MercadoPagoOptions__PosId" \
-            --from-literal=MongoDbOptions__Endpoint="$MongoDbOptions__Endpoint" \
-            --from-literal=MongoDbOptions__Port="$MongoDbOptions__Port" \
-            --from-literal=MongoDbOptions__UserName="$MongoDbOptions__UserName" \
-            --from-literal=MongoDbOptions__Password="$MongoDbOptions__Password" \
+            --from-literal=MongoDbOptions__ConnectionString="$MongoDbOptions__ConnectionString" \
+            --from-literal=MongoDbOptions__Database="$MongoDbOptions__Database" \
             --from-literal=SqsOptions__ServiceUrl="$SqsOptions__ServiceUrl" \
             --from-literal=SqsOptions__QueueUrl="$SqsOptions__QueueUrl" \
             --from-literal=SqsOptions__AwsAccessKeyId="$SqsOptions__AwsAccessKeyId" \
