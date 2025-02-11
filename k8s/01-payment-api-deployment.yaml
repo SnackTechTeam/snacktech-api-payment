@@ -17,6 +17,8 @@ spec:
           envFrom: # Use envFrom to load from ConfigMap and Secret
             - secretRef:
                 name: api-payment-secret
+            - configMapRef:
+                name: api-payment-configmap
 
           resources:
             limits:
