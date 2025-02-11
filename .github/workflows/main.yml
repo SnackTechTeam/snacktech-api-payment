@@ -127,47 +127,49 @@ jobs:
       
       - name: Create/Update Secrets
         env:
-          MercadoPagoOptions__ClientSecret: ${{ secrets.MERCADO_PAGO_CLIENT_SECRET }}
-          MongoDbOptions__ConnectionString: ${{ secrets.PAGAMENTO_DB_CONNECTION_STRING }}
-          SqsOptions__AwsAccessKeyId: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          SqsOptions__AwsSecretAccessKey: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          MERCADO_PAGO_CLIENT_SECRET: ${{ secrets.MERCADO_PAGO_CLIENT_SECRET }}
+          PAGAMENTO_DB_CONNECTION_STRING: ${{ secrets.PAGAMENTO_DB_CONNECTION_STRING }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          secret_name=$(kubectl get secret api-payment-secret -o jsonpath='{.metadata.name}' 2>/dev/null)
+          SECRET_NAME="api-payment-secret"
 
-          if [ "$secret_name" != "" ]; then
-            kubectl delete secret "$secret_name"
+          if kubectl get secret "$SECRET_NAME" > /dev/null 2>&1; then
+            kubectl delete secret "$SECRET_NAME"
           fi
 
-          kubectl create secret generic api-payment-secret \
-            --from-literal=MercadoPagoOptions__ClientSecret="$MercadoPagoOptions__ClientSecret" \
-            --from-literal=MongoDbOptions__ConnectionString="$MongoDbOptions__ConnectionString" \
-            --from-literal=SqsOptions__AwsAccessKeyId="$SqsOptions__AwsAccessKeyId" \
-            --from-literal=SqsOptions__AwsSecretAccessKey="$SqsOptions__AwsSecretAccessKey"
+          kubectl create secret generic "$SECRET_NAME" \
+            --from-literal=MercadoPagoOptions__ClientSecret="$MERCADO_PAGO_CLIENT_SECRET" \
+            --from-literal=MongoDbOptions__ConnectionString="$PAGAMENTO_DB_CONNECTION_STRING" \
+            --from-literal=SqsOptions__AwsAccessKeyId="$AWS_ACCESS_KEY_ID" \
+            --from-literal=SqsOptions__AwsSecretAccessKey="$AWS_SECRET_ACCESS_KEY"
 
       - name: Create/Update configmap
         env:
-          MercadoPagoOptions__UrlBase: ${{ vars.MERCADO_PAGO_URL_BASE }}
-          MercadoPagoOptions__ClientId: ${{ vars.MERCADO_PAGO_CLIENT_ID }}
-          MercadoPagoOptions__UserId: ${{ vars.MERCADO_PAGO_USER_ID }}
-          MercadoPagoOptions__PosId: ${{ vars.MERCADO_PAGO_POS_ID }}
-          MongoDbOptions__Database: ${{ vars.DB_NAME_PAYMENT }}
-          SqsOptions__QueueUrl: https://sqs.${{ vars.AWS_REGION }}.amazonaws.com/${{ secrets.AWS_ACCOUNT_ID_VOCLABS }}/${{ vars.SQS_QUEUE_PAYMENT_NAME }} 
-          SqsOptions__ServiceUrl: https://sqs.${{ vars.AWS_REGION }}.amazonaws.com
-        run: |
-          configmap_name=$(kubectl get configmap api-payment-configmap -o jsonpath='{.metadata.name}' 2>/dev/null)
+          MERCADO_PAGO_URL_BASE: ${{ vars.MERCADO_PAGO_URL_BASE }}
+          MERCADO_PAGO_CLIENT_ID: ${{ vars.MERCADO_PAGO_CLIENT_ID }}
+          MERCADO_PAGO_USER_ID: ${{ vars.MERCADO_PAGO_USER_ID }}
+          MERCADO_PAGO_POS_ID: ${{ vars.MERCADO_PAGO_POS_ID }}
+          DB_NAME_PAYMENT: ${{ vars.DB_NAME_PAYMENT }}
+          AWS_REGION: ${{ vars.AWS_REGION }} 
+          SQS_QUEUE_PAYMENT_NAME: ${{ vars.SQS_QUEUE_PAYMENT_NAME }} 
+          AWS_ACCOUNT_ID_VOCLABS: ${{ secrets.AWS_ACCOUNT_ID_VOCLABS }}
 
-          if [ "$configmap_name" != "" ]; then
-            kubectl delete configmap "$configmap_name"
+        run: |
+          CONFIGMAP_NAME="api-payment-configmap" 
+
+          if kubectl get configmap "$CONFIGMAP_NAME" > /dev/null 2>&1; then
+            kubectl delete configmap "$CONFIGMAP_NAME"
           fi
 
-          kubectl create configmap api-payment-configmap \
-            --from-literal=MercadoPagoOptions__UrlBase="$MercadoPagoOptions__UrlBase" \
-            --from-literal=MercadoPagoOptions__ClientId="$MercadoPagoOptions__ClientId" \
-            --from-literal=MercadoPagoOptions__UserId="$MercadoPagoOptions__UserId" \
-            --from-literal=MercadoPagoOptions__PosId="$MercadoPagoOptions__PosId" \
-            --from-literal=MongoDbOptions__Database="$MongoDbOptions__Database" \
-            --from-literal=SqsOptions__QueueUrl="$SqsOptions__QueueUrl" \
-            --from-literal=SqsOptions__ServiceUrl="$SqsOptions__ServiceUrl"
+          kubectl create configmap "$CONFIGMAP_NAME" \
+            --from-literal=MercadoPagoOptions__UrlBase="$MERCADO_PAGO_URL_BASE" \
+            --from-literal=MercadoPagoOptions__ClientId="$MERCADO_PAGO_CLIENT_ID" \
+            --from-literal=MercadoPagoOptions__UserId="$MERCADO_PAGO_USER_ID" \
+            --from-literal=MercadoPagoOptions__PosId="$MERCADO_PAGO_POS_ID" \
+            --from-literal=MongoDbOptions__Database="$DB_NAME_PAYMENT" \
+            --from-literal=SqsOptions__QueueUrl="https://sqs.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ACCOUNT_ID_VOCLABS }}/${{ env.SQS_QUEUE_PAYMENT_NAME }}" \
+            --from-literal=SqsOptions__ServiceUrl="https://sqs.${{ env.AWS_REGION }}.amazonaws.com"
 
       - name: Replace ECR image string value
         env:
