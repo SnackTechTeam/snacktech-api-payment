@@ -1,4 +1,5 @@
 using common.Api;
+using common.ApiSource.MercadoPago;
 using common.DataSource;
 using common.Enums;
 using common.ExternalSource.MongoDb;
@@ -18,7 +19,32 @@ namespace core.usecases
                     pedidoDto = pedido,
                     pagamentoDto = dadoPagamento
                 };
-                await mongoDbGateway.GravarPagamento(entidadePagamento);
+                await mongoDbGateway.GravarPagamento(entidadePagamento,StatusPagamento.Pendente);
+                return PagamentoPresenter.ApresentarResultadoPagamento(pedido,dadoPagamento);
+            }
+            catch(Exception ex){
+                return GeralPresenter.ApresentarResultadoErroInterno<PagamentoDto>(ex);
+            }
+        }
+
+        internal static async Task<ResultadoOperacao<PagamentoDto>> GerarPagamentoViaMock(IMongoDbGateway mongoDbGateway, ISqsGateway sqsGateway, PedidoDto pedido){
+            try{
+                var dadoPagamento = new MercadoPagoQrCodeDto{
+                        DadoDoCodigo = "00020101021243650016COM.FAKEDATA020130636974f89bd-380b-4d40-a7d3-320d852e82145204000053039865802BR5909Teste Tes6009SAO PAULO62070503***63043449",
+                        LojaPedidoId = "loja-pedido-id",
+                        ValorPagamento = pedido.Itens.Sum(i => i.Valor)
+                    };
+                var entidadePagamento = new PagamentoEntityDto{
+                    pedidoDto = pedido,
+                    pagamentoDto = dadoPagamento
+                };
+                await mongoDbGateway.GravarPagamento(entidadePagamento,StatusPagamento.Concluido);
+                BuscaPagamentoDto pagamentoGravado = await mongoDbGateway.BuscarPagamentoPorPedidoId(pedido.PedidoId) ?? throw new ArgumentException("Pagamento não encontrado na base de dados.");
+                var dataDeAtualizacao = DateTime.Now;
+                var pagamentoPedido = new PagamentoPedido(pedido.PedidoId,pagamentoGravado.PagamentoId,dataDeAtualizacao,"MercadoPago");
+
+                await sqsGateway.PublicarMensagemPagamentoNoSqs(pagamentoPedido);
+
                 return PagamentoPresenter.ApresentarResultadoPagamento(pedido,dadoPagamento);
             }
             catch(Exception ex){

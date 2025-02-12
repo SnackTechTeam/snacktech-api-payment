@@ -2,6 +2,7 @@ using common.Interfaces;
 using driver.mercado_pago;
 using driver.mercado_pago.services;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace unit_tests.mercadopago
@@ -12,8 +13,10 @@ namespace unit_tests.mercadopago
         public void InjecaoDeDependenciaFeitaCorretamente()
         {
             var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+            var loggerMock = new Mock<ILogger<MercadoPagoService>>();
             var services = new ServiceCollection();
             services.AddSingleton(httpClientFactoryMock.Object);
+            services.AddSingleton(loggerMock.Object);
 
             services.AddMercadoPagoService();
 

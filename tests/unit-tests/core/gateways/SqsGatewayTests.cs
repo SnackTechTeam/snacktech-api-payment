@@ -17,7 +17,7 @@ namespace unit_tests.core.gateways
         }
 
         [Fact]
-        public async Task PublicarMensagemPagamentoNoSqs_ShouldCallSendMessageAsync()
+        public async Task PublicarMensagemPagamentoNoSqsEnviandoMensagemComSucesso()
         {
             // Arrange
             var pagamentoMessageDto = new PagamentoMessageDto();

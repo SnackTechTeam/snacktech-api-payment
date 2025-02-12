@@ -11,7 +11,7 @@ namespace core.gateways
     {
         internal async Task<MercadoPagoQrCodeDto> IntegrarPedido(PedidoDto pedidoDto){
             var autenticacao = await apiMercadoPago.Autenticar(mercadoPagoOptions);
-            var resposta = await apiMercadoPago.GerarQrCode(autenticacao.TokenDeAcesso, mercadoPagoOptions,pedidoDto);
+            var resposta = await apiMercadoPago.GerarQrCode(autenticacao.TokenDeAcesso, mercadoPagoOptions, pedidoDto);
 
             return resposta;
         }

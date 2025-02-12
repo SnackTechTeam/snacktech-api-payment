@@ -39,7 +39,7 @@ namespace unittests.core.usecases
                 .ReturnsAsync(qrCodeDto);
 
             mongoDbGatewayMock
-                .Setup(x => x.GravarPagamento(It.IsAny<PagamentoEntityDto>()))
+                .Setup(x => x.GravarPagamento(It.IsAny<PagamentoEntityDto>(), It.IsAny<StatusPagamento>()))
                 .Returns(Task.CompletedTask);
 
             // Act
@@ -50,7 +50,7 @@ namespace unittests.core.usecases
 
             // Assert
             Assert.True(resultado.Sucesso);
-            mongoDbGatewayMock.Verify(x => x.GravarPagamento(It.IsAny<PagamentoEntityDto>()), Times.Once);
+            mongoDbGatewayMock.Verify(x => x.GravarPagamento(It.IsAny<PagamentoEntityDto>(), It.IsAny<StatusPagamento>()), Times.Once);
         }
 
         [Fact]
@@ -68,7 +68,7 @@ namespace unittests.core.usecases
                 pedidoMock);
 
             Assert.False(resultado.Sucesso);
-            mongoDbGatewayMock.Verify(x => x.GravarPagamento(It.IsAny<PagamentoEntityDto>()), Times.Never);
+            mongoDbGatewayMock.Verify(x => x.GravarPagamento(It.IsAny<PagamentoEntityDto>(), It.IsAny<StatusPagamento>()), Times.Never);
         }
 
         [Fact]
@@ -81,7 +81,7 @@ namespace unittests.core.usecases
                 .ReturnsAsync(qrCodeDto);
 
             mongoDbGatewayMock
-                .Setup(x => x.GravarPagamento(It.IsAny<PagamentoEntityDto>()))
+                .Setup(x => x.GravarPagamento(It.IsAny<PagamentoEntityDto>(), It.IsAny<StatusPagamento>()))
                 .ThrowsAsync(new Exception("Erro ao salvar"));
 
             var resultado = await PagamentosUseCase.GerarPagamentoAtravesDePedido(
@@ -383,6 +383,75 @@ namespace unittests.core.usecases
             // Assert
             Assert.False(resultado.Sucesso);
             Assert.Equal("Erro interno na aplicação", resultado.Mensagem);
+        }
+
+        [Fact]
+        public async Task GerarPagamentoViaMockComSucesso()
+        {
+            // Arrange
+            var pedidoId = Guid.NewGuid();
+            var sqsGatewayMock = new Mock<ISqsGateway>();
+            var buscaPagamentoDto = new BuscaPagamentoDto{
+                ClienteId = Guid.NewGuid().ToString(),
+                DataCriacao = DateTime.Now,
+                DataUltimaAtualizacao = null,
+                PagamentoId = "123",
+                PedidoId = pedidoId.ToString(),
+                Status = StatusPagamento.Pendente.ToString(),
+                Valor = 10.5M
+            };
+
+            mongoDbGatewayMock.Setup(m => m.GravarPagamento(It.IsAny<PagamentoEntityDto>(), It.IsAny<StatusPagamento>())).Returns(Task.CompletedTask);
+            mongoDbGatewayMock.Setup(m => m.BuscarPagamentoPorPedidoId(It.IsAny<Guid>())).ReturnsAsync(buscaPagamentoDto);
+            sqsGatewayMock.Setup(s => s.PublicarMensagemPagamentoNoSqs(It.IsAny<PagamentoMessageDto>())).Returns(Task.CompletedTask);
+
+            // Act
+            var result = await PagamentosUseCase.GerarPagamentoViaMock(mongoDbGatewayMock.Object, sqsGatewayMock.Object, pedidoMock);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.True(result.Sucesso);
+            mongoDbGatewayMock.Verify(m => m.GravarPagamento(It.IsAny<PagamentoEntityDto>(), It.IsAny<StatusPagamento>()), Times.Once);
+            mongoDbGatewayMock.Verify(m => m.BuscarPagamentoPorPedidoId(It.IsAny<Guid>()), Times.Once);
+            sqsGatewayMock.Verify(s => s.PublicarMensagemPagamentoNoSqs(It.IsAny<PagamentoMessageDto>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task GerarPagamentoViaMockPagamentoNaoEncontrado()
+        {
+            // Arrange
+            mongoDbGatewayMock.Setup(m => m.GravarPagamento(It.IsAny<PagamentoEntityDto>(), It.IsAny<StatusPagamento>())).Returns(Task.CompletedTask);
+            mongoDbGatewayMock.Setup(m => m.BuscarPagamentoPorPedidoId(It.IsAny<Guid>())).ReturnsAsync((BuscaPagamentoDto)null);
+
+            // Act
+            var result = await PagamentosUseCase.GerarPagamentoViaMock(mongoDbGatewayMock.Object, sqsGatewayMock.Object, pedidoMock);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.False(result.Sucesso);
+            Assert.Equal("Pagamento não encontrado na base de dados.", result.Mensagem);
+            mongoDbGatewayMock.Verify(m => m.GravarPagamento(It.IsAny<PagamentoEntityDto>(), It.IsAny<StatusPagamento>()), Times.Once);
+            mongoDbGatewayMock.Verify(m => m.BuscarPagamentoPorPedidoId(It.IsAny<Guid>()), Times.Once);
+            sqsGatewayMock.Verify(s => s.PublicarMensagemPagamentoNoSqs(It.IsAny<PagamentoMessageDto>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task GerarPagamentoViaMockTratandoException()
+        {
+            // Arrange
+          
+            mongoDbGatewayMock.Setup(m => m.GravarPagamento(It.IsAny<PagamentoEntityDto>(), It.IsAny<StatusPagamento>())).ThrowsAsync(new Exception("Database error"));
+
+            // Act
+            var result = await PagamentosUseCase.GerarPagamentoViaMock(mongoDbGatewayMock.Object, sqsGatewayMock.Object, pedidoMock);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.False(result.Sucesso);
+            Assert.Equal("Database error", result.Mensagem);
+            mongoDbGatewayMock.Verify(m => m.GravarPagamento(It.IsAny<PagamentoEntityDto>(), It.IsAny<StatusPagamento>()), Times.Once);
+            mongoDbGatewayMock.Verify(m => m.BuscarPagamentoPorPedidoId(It.IsAny<Guid>()), Times.Never);
+            sqsGatewayMock.Verify(s => s.PublicarMensagemPagamentoNoSqs(It.IsAny<PagamentoMessageDto>()), Times.Never);
         }
     }
 }

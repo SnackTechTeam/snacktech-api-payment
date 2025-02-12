@@ -37,8 +37,8 @@ namespace driver.database.mongo.Repositories
             return pagamento is null?default:pagamento;
         }
 
-        public async Task CriarPagamento(PagamentoEntityDto pagamentoDto){
-            Pagamento pagamento = Pagamento.ConverterParaPagamento(pagamentoDto,StatusPagamento.Pendente);
+        public async Task CriarPagamento(PagamentoEntityDto pagamentoDto,StatusPagamento statusPagamento){
+            Pagamento pagamento = Pagamento.ConverterParaPagamento(pagamentoDto,statusPagamento);
             await collection.InsertOneAsync(pagamento);
         }
 

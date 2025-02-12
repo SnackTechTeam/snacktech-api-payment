@@ -36,5 +36,12 @@ namespace core.controllers
             var resultado = await PagamentosUseCase.GerarPagamentoAtravesDePedido(mercadoPagoGateway,mongoDbGateway,pedido);
             return resultado;
         }
+
+        public async Task<ResultadoOperacao<PagamentoDto>> CriarPagamentoMock(PedidoDto pedido){
+            var mongoDbGateway = new MongoDbGateway(mongoDbIntegration);
+            var sqsGateway = new SqsGateway(sqsIntegration);
+            var resultado = await PagamentosUseCase.GerarPagamentoViaMock(mongoDbGateway,sqsGateway,pedido);
+            return resultado;
+        }
     }
 }

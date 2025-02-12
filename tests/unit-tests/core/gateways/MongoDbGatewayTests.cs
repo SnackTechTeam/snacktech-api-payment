@@ -23,14 +23,14 @@ namespace unit_tests.core.gateways
             // Arrange
             var pagamentoEntityDto = new PagamentoEntityDto();
 
-            _mongoDbIntegrationMock.Setup(m => m.CriarPagamento(pagamentoEntityDto))
+            _mongoDbIntegrationMock.Setup(m => m.CriarPagamento(pagamentoEntityDto, It.IsAny<StatusPagamento>()))
                 .Returns(Task.CompletedTask);
 
             // Act
-            await _mongoDbGateway.GravarPagamento(pagamentoEntityDto);
+            await _mongoDbGateway.GravarPagamento(pagamentoEntityDto, StatusPagamento.Pendente);
 
             // Assert
-            _mongoDbIntegrationMock.Verify(m => m.CriarPagamento(pagamentoEntityDto), Times.Once);
+            _mongoDbIntegrationMock.Verify(m => m.CriarPagamento(pagamentoEntityDto, It.IsAny<StatusPagamento>()), Times.Once);
         }
 
         [Fact]

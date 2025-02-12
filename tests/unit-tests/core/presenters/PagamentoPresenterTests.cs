@@ -7,7 +7,7 @@ namespace unit_tests.core.presenters
     public class PagamentoPresenterTests
     {
         [Fact]
-        public void ApresentarResultadoPagamento_WithValidInputs_ReturnsExpectedResult()
+        public void ApresentarResultadoPagamentoRetornandoResultadoEsperado()
         {
             // Arrange
             var pedido = ObjectsBuilder.BuildPedidoDto();

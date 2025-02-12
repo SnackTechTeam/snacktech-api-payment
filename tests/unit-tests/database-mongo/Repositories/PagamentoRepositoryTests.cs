@@ -80,17 +80,17 @@ namespace unit_tests.databasemongo.Repositories
         }
 
         [Fact]
-        public async Task CriarPagamento_InsertsPagamento()
+        public async Task CriarPagamentoInserePagamento()
         {
             var pagamentoDto = new PagamentoEntityDto { pedidoDto = ObjectsBuilder.BuildPedidoDto(), pagamentoDto = ObjectsBuilder.BuildMercadoPagoQrCodeDto() };
 
-            await pagamentoRepository.CriarPagamento(pagamentoDto);
+            await pagamentoRepository.CriarPagamento(pagamentoDto, StatusPagamento.Pendente);
 
             mongoCollectionMock.Verify(c => c.InsertOneAsync(It.Is<Pagamento>(p => p.PedidoId == pagamentoDto.pedidoDto.PedidoId.ToString()), null, default), Times.Once);
         }
 
         [Fact]
-        public async Task AtualizarStatusPagamentoPorPedidoId_UpdatesStatus_WhenFound()
+        public async Task AtualizarStatusPagamentoPorPedidoIdAtualizaStatusQuandoEncontrado()
         {
             var pedidoId = "123";
             var novoStatus = StatusPagamento.Concluido;
@@ -106,7 +106,7 @@ namespace unit_tests.databasemongo.Repositories
         }
 
         [Fact]
-        public async Task AtualizarStatusPagamentoPorPedidoId_ReturnsFalse_WhenNotFound()
+        public async Task AtualizarStatusPagamentoPorPedidoIdRetornaFalseCasoNaoEncontrado()
         {
             var pedidoId = "123";
             var novoStatus = StatusPagamento.Concluido;
