@@ -2,6 +2,7 @@ using System.Net;
 using common.Interfaces;
 using driver.mercado_pago.payloads;
 using driver.mercado_pago.services;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
@@ -12,6 +13,7 @@ namespace unit_tests.mercadopago.services
     public class MercadoPagoServiceTests
     {
         private readonly IMercadoPagoIntegration mercadoPagoService;
+        private readonly Mock<ILogger<MercadoPagoService>> loggerMock;
         private readonly Mock<IHttpClientFactory> clientFactoryMock;
 
         private HttpClient ConfigureHttpClient(HttpStatusCode httpStatusCode,string content){
@@ -37,7 +39,8 @@ namespace unit_tests.mercadopago.services
     
         public MercadoPagoServiceTests(){
             clientFactoryMock = new Mock<IHttpClientFactory>();
-            mercadoPagoService = new MercadoPagoService(clientFactoryMock.Object);
+            loggerMock = new Mock<ILogger<MercadoPagoService>>();
+            mercadoPagoService = new MercadoPagoService(clientFactoryMock.Object,loggerMock.Object);
         }
 
 

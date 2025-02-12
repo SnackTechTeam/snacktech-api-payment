@@ -3,13 +3,15 @@ using common.DataSource;
 using common.Interfaces;
 using common.Options;
 using driver.mercado_pago.payloads;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace driver.mercado_pago.services
 {
-    public class MercadoPagoService(IHttpClientFactory httpClientFactory) : IMercadoPagoIntegration
+    public class MercadoPagoService(IHttpClientFactory httpClientFactory, ILogger<MercadoPagoService> logger) : IMercadoPagoIntegration
     {
         private readonly IHttpClientFactory httpClientFactory = httpClientFactory;   
+        private readonly ILogger<MercadoPagoService> logger = logger;
 
         public async Task<AutenticacaoMercadoPagoDto> Autenticar(MercadoPagoOptions mercadoPagoOptions){
             var rota = "oauth/token";
@@ -19,9 +21,9 @@ namespace driver.mercado_pago.services
             var conteudoJson = GerarConteudoParaRequisicao(objetoPayload);
 
             var clientHttp = CriarHttpClientBase(mercadoPagoOptions.UrlBase);
-
+            logger.LogInformation($"Iniciando autenticação com o mercado pago. URL {mercadoPagoOptions.UrlBase}/{rota}. ClientId: {mercadoPagoOptions.ClientId}");
             var resposta = await clientHttp.PostAsync(rota,conteudoJson);
-
+            logger.LogInformation($"Resposta da autenticação com o mercado pago. Status: {resposta.StatusCode}. {resposta.ReasonPhrase}");
             resposta.EnsureSuccessStatusCode();
 
             var conteudoRespostaRequisicao = await RetornarConteudo<AutenticacaoResponse>(resposta);
@@ -40,11 +42,12 @@ namespace driver.mercado_pago.services
             var rota = $"instore/orders/qr/seller/collectors/{userId}/pos/{posId}/qrs";
 
             var content = GerarConteudoParaRequisicao(pedidoMercadoPago);
-
             var httpClient = CriarHttpClientBase(serviceUrl);
             httpClient.DefaultRequestHeaders.Add("Authorization",$"Bearer {accessToken}");
 
+            logger.LogInformation($"Gerando QR Code para o pedido {pedidoMercadoPago.ExternalReference}. URL {serviceUrl}/{rota}");
             var resposta = await httpClient.PutAsync(rota, content);
+            logger.LogInformation($"Resposta da geração do QR Code para o pedido {pedidoMercadoPago.ExternalReference}. Status: {resposta.StatusCode}. {resposta.ReasonPhrase}");
             var conteudoResposta = await RetornarConteudo<PedidoResponse>(resposta);
 
             MercadoPagoQrCodeDto retorno = PedidoResponse.ConverterParaMercadoPagoQrCodeDto(conteudoResposta,pedidoMercadoPago.TotalAmount);
@@ -58,8 +61,9 @@ namespace driver.mercado_pago.services
             var httpClient = CriarHttpClientBase(mercadoPagoOptions.UrlBase);
             httpClient.DefaultRequestHeaders.Add("Authorization",$"Bearer {accessToken}");
 
+            logger.LogInformation($"Buscando ordem de pagamento com o orderId {orderId}. URL {mercadoPagoOptions.UrlBase}/{rota}");
             var resposta = await httpClient.GetAsync(rota);
-
+            logger.LogInformation($"Resposta da busca da ordem de pagamento com o orderId {orderId}. Status: {resposta.StatusCode}. {resposta.ReasonPhrase}");
             var conteudoResposta = await RetornarConteudo<MerchantOrder>(resposta);
 
             return Guid.Parse(conteudoResposta.ExternalReference);

@@ -64,5 +64,14 @@ namespace api.Controllers
         [Route("")]
         public async Task<IActionResult> CriarPagamentoParaPedido([FromBody] PedidoDto pedido)
             => await ExecucaoPadrao("Pagamento.CriarPagamento",pagamentoDomainController.CriarPagamento(pedido));
+
+        [HttpPost]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType<Guid>(StatusCodes.Status200OK)]
+        [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType<ErrorResponse>(StatusCodes.Status500InternalServerError)]
+        [Route("mock")]
+        public async Task<IActionResult> CriarPagamentoMock([FromBody] PedidoDto pedido)
+            => await ExecucaoPadrao("Pagamento.CriarPagamentoMock",pagamentoDomainController.CriarPagamentoMock(pedido));
     }
 }

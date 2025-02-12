@@ -8,8 +8,8 @@ namespace core.gateways
 {
     internal class MongoDbGateway(IMongoDbIntegration mongoDbIntegration): IMongoDbGateway
     {
-        internal async Task GravarPagamento(PagamentoEntityDto pagamentoEntityDto){
-            await mongoDbIntegration.CriarPagamento(pagamentoEntityDto);
+        internal async Task GravarPagamento(PagamentoEntityDto pagamentoEntityDto, StatusPagamento statusPagamento){
+            await mongoDbIntegration.CriarPagamento(pagamentoEntityDto, statusPagamento);
         }    
 
         internal async Task<bool> AtualizarPagamentoPorPedidoId(Guid pedidoId, StatusPagamento statusPagamento, DateTime dataAtualizacao){
@@ -23,9 +23,9 @@ namespace core.gateways
         }
 
         [ExcludeFromCodeCoverage]
-        Task IMongoDbGateway.GravarPagamento(PagamentoEntityDto pagamentoEntityDto)
+        Task IMongoDbGateway.GravarPagamento(PagamentoEntityDto pagamentoEntityDto, StatusPagamento statusPagamento)
         {
-            return GravarPagamento(pagamentoEntityDto);
+            return GravarPagamento(pagamentoEntityDto, statusPagamento);
         }
 
         [ExcludeFromCodeCoverage]
