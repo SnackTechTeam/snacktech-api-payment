@@ -7,8 +7,8 @@ namespace driver.database.mongo.Entities
 {
     public class Pagamento
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
+        [BsonId] 
+        [BsonRepresentation(BsonType.String)]
         public string Id {get; set;} = default!;
 
         public string PedidoId {get; set;} = default!;
@@ -24,6 +24,7 @@ namespace driver.database.mongo.Entities
 
         public static Pagamento ConverterParaPagamento(PagamentoEntityDto pagamentoEntityDto, StatusPagamento statusPagamento){
             return new Pagamento{
+                Id = Guid.NewGuid().ToString(),
                 PedidoId = pagamentoEntityDto.pedidoDto.PedidoId.ToString(),
                 Cliente = pagamentoEntityDto.pedidoDto.Cliente,
                 DataCriacao = DateTime.Now,
