@@ -13,7 +13,7 @@ namespace api.Configuration
                 var config = new AmazonSQSConfig{
                     ServiceURL = settings.ServiceUrl
                 };
-                return new AmazonSQSClient(settings.AwsAccessKeyId, settings.AwsSecretAccessKey, config);
+                return new AmazonSQSClient(settings.AwsAccessKeyId, settings.AwsSecretAccessKey, settings.AwsSecretAccessToken, config);
             });
             return services;
         }

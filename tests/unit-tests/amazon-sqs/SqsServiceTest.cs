@@ -20,6 +20,7 @@ namespace unit_tests.amazonsqs
             {
                 AwsAccessKeyId = "access-key",
                 AwsSecretAccessKey = "secret-key",
+                AwsSecretAccessToken = "token",
                 ServiceUrl = "http://localhost",
                 QueueUrl = "http://localhost/fila"
             });
