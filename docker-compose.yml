@@ -59,6 +59,7 @@ services:
       - SqsOptions__QueueUrl=http://localstack:4566/000000000000/snacktech-processed-payments
       - SqsOptions__AwsAccessKeyId=test
       - SqsOptions__AwsSecretAccessKey=test
+      - SqsOptions__AwsSecretAccessToken=test
     ports:
       - 8080:8080
       - 8081:8081

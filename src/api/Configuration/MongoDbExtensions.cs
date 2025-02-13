@@ -10,9 +10,17 @@ namespace api.Configuration
 
             services.AddSingleton<IMongoClient>(sp => {
                 var settings = sp.GetRequiredService<IOptions<MongoDbOptions>>().Value;
-                var connectionStringBase = $"mongodb://{settings.UserName}:{settings.Password}@{settings.Endpoint}:{settings.Port}";
-                var connectionStringFinal = settings.SSL ? $"{connectionStringBase}/?ssl=true&sslCAFile={settings.SslCertificatePath}":connectionStringBase;
-                return new MongoClient(connectionStringFinal);
+
+                string connectionString = "";
+
+                if(settings.ConnectionString != null){
+                    connectionString = settings.ConnectionString;
+                } else {
+                    var connectionStringBase = $"mongodb://{settings.UserName}:{settings.Password}@{settings.Endpoint}:{settings.Port}";
+                    connectionString = settings.SSL ? $"{connectionStringBase}/?ssl=true&sslCAFile={settings.SslCertificatePath}":connectionStringBase;
+                }
+
+                return new MongoClient(connectionString);
             });
 
             services.AddScoped<IMongoDatabase>(sp => {
