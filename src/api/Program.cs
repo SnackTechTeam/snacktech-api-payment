@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using api.Configuration;
 using api.Configuration.HealthChecks;
 using common.Options;
@@ -68,3 +69,6 @@ app.MapGet("/", context =>
 app.MapControllers();
 
 await app.RunAsync();
+
+[ExcludeFromCodeCoverage]
+public static partial class Program { }
