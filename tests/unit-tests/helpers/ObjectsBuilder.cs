@@ -1,6 +1,8 @@
+using common.Api;
 using common.ApiSource.MercadoPago;
 using common.DataSource;
 using common.Options;
+using core.domain;
 using driver.database.mongo.Entities;
 
 namespace unit_tests.helpers
@@ -60,6 +62,13 @@ namespace unit_tests.helpers
             QrCodePagamento = "QrCodePagamento",
             Status = "Status",
             Valor = 10.0M
+        };
+
+        public static PagamentoProcessadoDto BuildPagamentoProcessadoDto()
+        => new PagamentoProcessadoDto{
+            Action = "update",
+            Id = "Id",
+            Status = "closed"
         };
     }
 }

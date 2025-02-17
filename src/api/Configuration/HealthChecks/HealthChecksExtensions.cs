@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Mime;
 using System.Text.Json;
@@ -9,6 +10,7 @@ using MongoDB.Driver;
 
 namespace api.Configuration.HealthChecks
 {
+    [ExcludeFromCodeCoverage]
     public static class HealthChecksExtensions
     {
         public static  IServiceCollection AddCustomHealthChecks(this IServiceCollection services){
