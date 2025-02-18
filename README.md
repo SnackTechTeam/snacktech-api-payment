@@ -92,3 +92,7 @@ A aplicação conta com 2 projetos de testes.
 Para alterar o código da aplicação, recomendamos que faça um clone do repositório e crie uma branch própria partindo da branch development, para não perder últimas mudanças.
 
 Após aplicar as alterações, abra um PR apontando para a branch development como destino e espere a aprovação. Uma vez aprovado a pipeline de CI/CD deve entrar em ação, passando o código pelo Sonar e gerando o artefato necessário para seguir com o deploy.
+
+## Cobertura de testes automatizados
+
+![Cobertura de teste](./cobertura.png)
